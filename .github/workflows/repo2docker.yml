@@ -5,7 +5,7 @@ on:
       - master
 env:
   CONTAINER_NAME: ${{ github.repository }}
-  DOCKER_TAG: ${{ github.sha }} 
+  DOCKER_TAG: ${{ github.sha }}
   REPO_NAME: isce2-repo2docker
 
 jobs:
@@ -13,23 +13,34 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v1
-    - name: Set Up Python
+    - name: Set Up Python 3.7
       uses: actions/setup-python@v1
       with:
         python-version: 3.7
     - name: Install Dependencies
+      uses: actions/cache@v1
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
       run: |
-        pip install jupyter-repo2docker==0.10
+        python --version
+        pip install -r requirements.txt
         export VERSION=$(python3 -c "import repo2docker; print(repo2docker.__version__)")
         echo "repo2docker version: ${VERSION}"
         echo "1. Preparing building environment"
         echo "Working directory is ${PWD}"
         echo "Container image is is ${CONTAINER_IMAGE}"
         echo "Docker tag is ${DOCKER_TAG}"
-        ls
     - name: Build Image
       run: |
         jupyter-repo2docker --debug --user-name jovyan --user-id 1000 --no-run --image-name "${CONTAINER_NAME}:${DOCKER_TAG}" "${PWD}"
-    - name: Push Image
-      run: | 
-        echo 'Not Yet Implemented'
+    - name: Authenticate with GitHub Packages
+      run: |
+        echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+    - name: Push GitHub Package
+      run: |
+        IMAGE_ID=docker.pkg.github.com/$CONTAINER_NAME
+        docker tag image $IMAGE_ID:$DOCKER_TAG
+        docker push $IMAGE_ID:$DOCKER_TAG
