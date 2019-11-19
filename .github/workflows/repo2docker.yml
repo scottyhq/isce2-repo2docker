@@ -19,9 +19,7 @@ jobs:
         python-version: 3.7
     - name: Install Dependencies
       run: |
-        python3 -m venv venv
-        . venv/bin/activate
-        pip install jupyter-repo2docker
+        pip install jupyter-repo2docker==0.10
         export VERSION=$(python3 -c "import repo2docker; print(repo2docker.__version__)")
         echo "repo2docker version: ${VERSION}"
         echo "1. Preparing building environment"
@@ -31,7 +29,6 @@ jobs:
         ls
     - name: Build Image
       run: |
-        . venv/bin/activate
         jupyter-repo2docker --debug --user-name jovyan --user-id 1000 --no-run --image-name "${CONTAINER_NAME}:${DOCKER_TAG}" "${REPO_NAME}"
     - name: Push Image
       run: | 
