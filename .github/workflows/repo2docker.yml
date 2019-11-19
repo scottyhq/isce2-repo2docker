@@ -1,0 +1,35 @@
+name: Repo2Docker
+on:
+  push:
+    branches:
+      - master
+env:
+  CONTAINER_IMAGE: ${{ github.repository }}
+  DOCKER_TAG: ${{ github.sha }} 
+  REPO_NAME: isce2-repo2docker
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set Up Python
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.7
+    - name: Install Dependencies
+      run: |
+        pip install repo2docker==0.10
+        export VERSION=$(python3 -c "import repo2docker; print(repo2docker.__version__)")
+        echo "repo2docker version: ${VERSION}"
+        echo "1. Preparing building environment"
+        echo "Working directory is ${PWD}"
+        echo "Container image is is ${CONTAINER_IMAGE}"
+        echo "Docker tag is ${DOCKER_TAG}"
+        ls
+    - name: Build Image
+      run: |
+        jupyter-repo2docker --debug --user-name jovyan --user-id 1000 --no-run --image-name "${CONTAINER_NAME}:${DOCKER_TAG}" "${REPO_NAME}"
+    - name: Push Image
+      run: | 
+        echo 'Not Yet Implemented'
