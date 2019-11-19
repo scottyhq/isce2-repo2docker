@@ -29,7 +29,7 @@ jobs:
         ls
     - name: Build Image
       run: |
-        jupyter-repo2docker --debug --user-name jovyan --user-id 1000 --no-run --image-name "${CONTAINER_NAME}:${DOCKER_TAG}" "${REPO_NAME}"
+        jupyter-repo2docker --debug --user-name jovyan --user-id 1000 --no-run --image-name "${CONTAINER_NAME}:${DOCKER_TAG}" "${PWD}"
     - name: Push Image
       run: | 
         echo 'Not Yet Implemented'
