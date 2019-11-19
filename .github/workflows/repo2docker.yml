@@ -31,6 +31,7 @@ jobs:
         ls
     - name: Build Image
       run: |
+        . venv/bin/activate
         jupyter-repo2docker --debug --user-name jovyan --user-id 1000 --no-run --image-name "${CONTAINER_NAME}:${DOCKER_TAG}" "${REPO_NAME}"
     - name: Push Image
       run: | 
