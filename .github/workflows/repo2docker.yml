@@ -1,7 +1,12 @@
 name: Repo2Docker
 
-on: [push, pull_request]
-
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 env:
   CONTAINER_NAME: ${{ github.repository }} # user/repo format
   DOCKER_TAG: ${{ github.sha }}
