@@ -4,9 +4,9 @@ on:
   push:
     branches:
       - master
-    # Publish `v1.2.3` tags as releases.
+    # Github tags (1.2.3) get corresponding DOCKER_IMAGE:1.2.3
     tags:
-      - v*
+      - *
     paths:
       - binder/*
       - requirements.txt
