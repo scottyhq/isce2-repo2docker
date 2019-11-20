@@ -56,12 +56,13 @@ jobs:
         else
           jupyter-repo2docker --debug --user-name jovyan --user-id 1000 --no-run --image-name $CONTAINER_NAME:latest $PWD
         fi
-        docker run $CONTAINER_NAME:latest conda list > conda-list.txt
+        mkdir conda-packages
+        docker run $CONTAINER_NAME:latest conda list > conda-packages/packages.txt
     - name: Archive Conda Package List
       uses: actions/upload-artifact@v1
       with:
-        name: conda-list.txt
-        path: conda-list.txt
+        name: conda-packages
+        path: conda-packages
     - name: Push Image to DockerHub (latest & sha tags)
       # Only push if merge to master or pushed tag with v1.2.3 semantic version
       if: github.ref == 'refs/heads/master'
