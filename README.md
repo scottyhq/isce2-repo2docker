@@ -33,7 +33,7 @@ docker push docker.pkg.github.com/$IMAGE:$TAG
 ## instructions for running jupyterlab from image locally
 ```
 docker pull docker.pkg.github.com/$IMAGE:$TAG
-docker run -it --name repo2docker -p 8888:8888 docker.pkg.github.com/$IMAGE:$TAG jupyter lab --ip 0.0.0.0
+docker run -it --name repo2docker -p 8888:8888 $IMAGE:$TAG jupyter lab --ip 0.0.0.0
 docker stop repo2docker
 docker rm repo2docker
 ```
