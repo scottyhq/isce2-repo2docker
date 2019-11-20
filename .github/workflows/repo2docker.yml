@@ -1,10 +1,15 @@
 name: Repo2Docker
 
-on: [push, pull_request]
-
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 env:
   CONTAINER_NAME: ${{ github.repository }} # user/repo format
-  DOCKER_TAG: ${{ github.sha }}
+  GITHUB_SHA: ${{ github.sha }}
 
 jobs:
   build:
@@ -27,20 +32,16 @@ jobs:
       run: |
         python --version
         pip install -r requirements.txt
-        export VERSION=$(python3 -c "import repo2docker; print(repo2docker.__version__)")
-        echo "repo2docker version: ${VERSION}"
-        echo "1. Preparing building environment"
-        echo "Working directory is ${PWD}"
-        echo "Container image is is ${CONTAINER_IMAGE}"
-        echo "Docker tag is ${DOCKER_TAG}"
     - name: Authenticate with DockerHub
       # Consider GitHub Packages once they allow for unathenticated pulling
       run: |
         echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
     - name: Build Image
+      # Tag with short 7-character SHA
       run: |
-        if docker pull "${CONTAINER_NAME}:${DOCKER_TAG}"; then
-          jupyter-repo2docker --cache-from "${CONTAINER_NAME}:${DOCKER_TAG}" --debug --user-name jovyan --user-id 1000 --no-run --image-name "${CONTAINER_NAME}:${DOCKER_TAG}" "${PWD}"
+        DOCKER_TAG=${GITHUB_SHA::8}
+        if docker pull "${CONTAINER_NAME}:latest"; then
+          jupyter-repo2docker --cache-from "${CONTAINER_NAME}:latest" --debug --user-name jovyan --user-id 1000 --no-run --image-name "${CONTAINER_NAME}:${DOCKER_TAG}" "${PWD}"
         else
           jupyter-repo2docker --debug --user-name jovyan --user-id 1000 --no-run --image-name "${CONTAINER_NAME}:${DOCKER_TAG}" "${PWD}"
         fi
@@ -48,6 +49,7 @@ jobs:
       # Only push if merge to master
       if: github.ref == 'refs/heads/master'
       run: |
+        DOCKER_TAG=${GITHUB_SHA::8}
         docker image ls
         docker tag $CONTAINER_NAME:$DOCKER_TAG $CONTAINER_NAME:latest
         docker push $CONTAINER_NAME:$DOCKER_TAG
