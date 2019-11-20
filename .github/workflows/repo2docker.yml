@@ -36,12 +36,13 @@ jobs:
         echo "Docker tag is ${DOCKER_TAG}"
     - name: Build Image
       run: |
-        jupyter-repo2docker --debug --user-name jovyan --user-id 1000 --no-run --image-name "${CONTAINER_NAME}:${DOCKER_TAG}" "${PWD}"
+        jupyter-repo2docker --debug --user-name jovyan --user-id 1000 --no-run --image-name $CONTAINER_NAME:$DOCKER_TAG $PWD
     - name: Authenticate with GitHub Packages
       run: |
         echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
     - name: Push GitHub Package
       run: |
-        IMAGE_ID=docker.pkg.github.com/$CONTAINER_NAME
-        docker tag image $IMAGE_ID:$DOCKER_TAG
+        docker image ls
+        REGISTRY_ID=docker.pkg.github.com/$CONTAINER_NAME
+        docker tag $CONTAINER_NAME:$DOCKER_TAG $REGISTRY_ID:$DOCKER_TAG
         docker push $IMAGE_ID:$DOCKER_TAG
