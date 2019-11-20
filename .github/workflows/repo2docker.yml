@@ -37,20 +37,20 @@ jobs:
       run: |
         echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
     - name: Build Image
-      # Tag with short 7-character SHA
+
       run: |
-        DOCKER_TAG=${GITHUB_SHA::8}
         if docker pull "${CONTAINER_NAME}:latest"; then
-          jupyter-repo2docker --cache-from "${CONTAINER_NAME}:latest" --debug --user-name jovyan --user-id 1000 --no-run --image-name "${CONTAINER_NAME}:${DOCKER_TAG}" "${PWD}"
+          jupyter-repo2docker --cache-from "${CONTAINER_NAME}:latest" --debug --user-name jovyan --user-id 1000 --no-run --image-name "${CONTAINER_NAME}:latest" "${PWD}"
         else
-          jupyter-repo2docker --debug --user-name jovyan --user-id 1000 --no-run --image-name "${CONTAINER_NAME}:${DOCKER_TAG}" "${PWD}"
+          jupyter-repo2docker --debug --user-name jovyan --user-id 1000 --no-run --image-name "${CONTAINER_NAME}:latest" "${PWD}"
         fi
     - name: Push Image to DockerHub
       # Only push if merge to master
       if: github.ref == 'refs/heads/master'
+      # Tag with short 7-character SHA
       run: |
-        DOCKER_TAG=${GITHUB_SHA::8}
+        DOCKER_TAG=${GITHUB_SHA::7}
         docker image ls
-        docker tag $CONTAINER_NAME:$DOCKER_TAG $CONTAINER_NAME:latest
+        docker tag $CONTAINER_NAME:latest $CONTAINER_NAME:$DOCKER_TAG
         docker push $CONTAINER_NAME:$DOCKER_TAG
         docker push $CONTAINER_NAME:latest
