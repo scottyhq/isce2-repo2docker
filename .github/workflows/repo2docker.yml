@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-    # Github tags (1.2.3) get corresponding DOCKER_IMAGE:1.2.3
+    # Github tags (1.2.3) get corresponding dockerhub tag (DOCKER_IMAGE:1.2.3)
     tags:
       - '*'
     paths:
@@ -34,6 +34,7 @@ jobs:
       with:
         python-version: 3.7
     - name: Enable Pip Cache
+      # https://github.com/actions/cache/blob/master/examples.md#python---pip
       uses: actions/cache@v1
       with:
         path: ~/.cache/pip
@@ -46,10 +47,12 @@ jobs:
         pip install -r requirements.txt
     - name: Authenticate with DockerHub
       # Consider GitHub Packages once they allow for unathenticated pulling
+      # https://github.com/actions/starter-workflows/blob/master/ci/docker-push.yml
       # echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
       run: |
         echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
     - name: Build Image
+      # Add folder of artifacts related to build that anyone can download
       run: |
         if docker pull $CONTAINER_NAME:latest; then
           jupyter-repo2docker --cache-from $CONTAINER_NAME:latest --debug --user-name jovyan --user-id 1000 --no-run --image-name $CONTAINER_NAME:latest $PWD
@@ -58,6 +61,7 @@ jobs:
         fi
         mkdir conda-packages
         docker run $CONTAINER_NAME:latest conda list > conda-packages/packages.txt
+        chmod -R a+rx conda-packages
     - name: Archive Conda Package List
       uses: actions/upload-artifact@v1
       with:
