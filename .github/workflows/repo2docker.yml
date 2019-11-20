@@ -6,7 +6,7 @@ on:
       - master
     # Github tags (1.2.3) get corresponding DOCKER_IMAGE:1.2.3
     tags:
-      - *
+      - '*'
     paths:
       - binder/*
       - requirements.txt
