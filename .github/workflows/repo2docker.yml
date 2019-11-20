@@ -44,7 +44,7 @@ jobs:
         echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
     - name: Build Image
       run: |
-        if docker pull "${CONTAINER_NAME}:${DOCKER_TAG}"; then
+        if docker pull "${CONTAINER_NAME}:latest"; then
           jupyter-repo2docker --cache-from "${CONTAINER_NAME}:${DOCKER_TAG}" --debug --user-name jovyan --user-id 1000 --no-run --image-name "${CONTAINER_NAME}:${DOCKER_TAG}" "${PWD}"
         else
           jupyter-repo2docker --debug --user-name jovyan --user-id 1000 --no-run --image-name "${CONTAINER_NAME}:${DOCKER_TAG}" "${PWD}"
