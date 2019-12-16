@@ -1,6 +1,7 @@
 # packages in addition to repo2docker/buildpacks/conda/environment.yml
 name: isce2
 channels:
+  - manics
   - conda-forge
 dependencies:
   - jupyterlab=1.2
@@ -16,4 +17,7 @@ dependencies:
   - bokeh=1.4
   - python-graphviz=0.13
   - isce2=2.3
+  - websockify
   - pip=19.3
+  - pip:
+    - jupyter-desktop-server
